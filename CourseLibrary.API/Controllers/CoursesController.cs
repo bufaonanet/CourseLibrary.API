@@ -11,6 +11,7 @@ namespace CourseLibrary.API.Controllers;
 
 [ApiController]
 [Route("api/authors/{authorId}/courses")]
+[ResponseCache(CacheProfileName = "240SecondsCacheProfile")]
 public class CoursesController : ControllerBase
 {
     private readonly ICourseLibraryRepository _courseLibraryRepository;
@@ -25,7 +26,8 @@ public class CoursesController : ControllerBase
             throw new ArgumentNullException(nameof(mapper));
     }
 
-    [HttpGet]
+
+    [HttpGet(Name = "GetCoursesForAuthor")]
     public async Task<ActionResult<IEnumerable<CourseDto>>> GetCoursesForAuthor(Guid authorId)
     {
         if (!await _courseLibraryRepository.AuthorExistsAsync(authorId))
@@ -37,6 +39,7 @@ public class CoursesController : ControllerBase
         return Ok(_mapper.Map<IEnumerable<CourseDto>>(coursesForAuthorFromRepo));
     }
 
+    [ResponseCache(Duration = 120)]
     [HttpGet("{courseId}", Name = "GetCourseForAuthor")]
     public async Task<ActionResult<CourseDto>> GetCourseForAuthor(Guid authorId, Guid courseId)
     {
@@ -54,7 +57,7 @@ public class CoursesController : ControllerBase
         return Ok(_mapper.Map<CourseDto>(courseForAuthorFromRepo));
     }
 
-    [HttpPost]
+    [HttpPost(Name = "CreateCourseForAuthor")]
     public async Task<ActionResult<CourseDto>> CreateCourseForAuthor(
             Guid authorId, CourseForCreationDto course)
     {
